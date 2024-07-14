@@ -1,4 +1,5 @@
 package tk.zwander.common.tools
+import tk.zwander.common.tools.FusClient
 
 import com.soywiz.korio.serialization.xml.Xml
 import com.soywiz.korio.serialization.xml.buildXml
