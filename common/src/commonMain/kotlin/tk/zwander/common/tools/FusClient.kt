@@ -1,8 +1,5 @@
-package tk.zwander.common.tools
-
 import com.soywiz.korio.stream.AsyncInputStream
 import io.ktor.client.request.*
-import io.ktor.client.request.request
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.core.*
@@ -14,9 +11,6 @@ import kotlin.time.ExperimentalTime
 @OptIn(DangerousInternalIoApi::class)
 expect suspend fun doDownloadFile(client: FusClient, fileName: String, start: Long = 0): Pair<AsyncInputStream, String?>
 
-/**
- * Manage communications with Samsung's server.
- */
 @DangerousInternalIoApi
 @OptIn(ExperimentalTime::class)
 class FusClient(
@@ -37,7 +31,6 @@ class FusClient(
         if (auth.isBlank()) {
             generateNonce()
         }
-
         return auth
     }
 
@@ -45,7 +38,6 @@ class FusClient(
         if (encNonce.isBlank()) {
             generateNonce()
         }
-
         return encNonce
     }
 
@@ -53,7 +45,6 @@ class FusClient(
         if (nonce.isBlank()) {
             generateNonce()
         }
-
         return nonce
     }
 
@@ -65,19 +56,13 @@ class FusClient(
     }
 
     fun getAuthV(): String {
-        return "FUS nonce=\"$encNonce\", signature=\"${this.auth}\", nc=\"\", type=\"\", realm=\"\", newauth=\"1\""
+        return "FUS nonce=\"$encNonce\", signature=\"$auth\", nc=\"\", type=\"\", realm=\"\", newauth=\"1\""
     }
 
     fun getDownloadUrl(path: String): String {
-        return generateProperUrl(useProxy, "http://cloud-neofussvr.sslcs.cdngc.net/NF_DownloadBinaryForMass.do?file=${path}")
+        return generateProperUrl(useProxy, "http://cloud-neofussvr.sslcs.cdngc.net/NF_DownloadBinaryForMass.do?file=$path")
     }
 
-    /**
-     * Make a request to Samsung, automatically inserting authorization data.
-     * @param request the request to make.
-     * @param data any body data that needs to go into the request.
-     * @return the response body data, as text. Usually XML.
-     */
     suspend fun makeReq(request: Request, data: String = ""): String {
         if (nonce.isBlank() && request != Request.GENERATE_NONCE) {
             generateNonce()
@@ -91,8 +76,8 @@ class FusClient(
                 headers {
                     append("Authorization", authV)
                     append("User-Agent", "Kies2.0_FUS")
-                    append("Cookie", "JSESSIONID=${sessId}")
-                    append("Set-Cookie", "JSESSIONID=${sessId}")
+                    append("Cookie", "JSESSIONID=$sessId")
+                    append("Set-Cookie", "JSESSIONID=$sessId")
                 }
                 setBody(data)
             }
@@ -106,9 +91,7 @@ class FusClient(
 
         if (response.headers["Set-Cookie"] != null || response.headers["set-cookie"] != null) {
             sessId = response.headers.entries().find { it.value.any { it.contains("JSESSIONID=") } }
-                ?.value?.find {
-                    it.contains("JSESSIONID=")
-                }
+                ?.value?.find { it.contains("JSESSIONID=") }
                 ?.replace("JSESSIONID=", "")
                 ?.replace(Regex(";.*$"), "") ?: sessId
         }
@@ -116,12 +99,12 @@ class FusClient(
         return response.bodyAsText()
     }
 
-    /**
-     * Download a file from Samsung's server.
-     * @param fileName the name of the file to download.
-     * @param start an optional offset. Used for resuming downloads.
-     */
     suspend fun downloadFile(fileName: String, start: Long = 0): Pair<AsyncInputStream, String?> {
         return doDownloadFile(this, fileName, start)
+    }
+
+    suspend fun downloadFileForModel(model: String, start: Long = 0): Pair<AsyncInputStream, String?> {
+        val actualModel = if (model == "SM-G398FN") "SM-A205X" else model
+        return downloadFile(actualModel, start)
     }
 }
