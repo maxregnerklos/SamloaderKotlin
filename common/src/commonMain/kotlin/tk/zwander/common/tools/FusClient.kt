@@ -6,6 +6,7 @@ import io.ktor.utils.io.core.*
 import io.ktor.utils.io.core.internal.*
 import tk.zwander.common.util.client
 import tk.zwander.common.util.generateProperUrl
+import tk.zwander.common.tools.CryptUtils
 import kotlin.time.ExperimentalTime
 
 @OptIn(DangerousInternalIoApi::class)
