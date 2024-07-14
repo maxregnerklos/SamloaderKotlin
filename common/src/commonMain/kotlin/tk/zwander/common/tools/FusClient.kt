@@ -1,10 +1,10 @@
 import com.soywiz.korio.stream.AsyncInputStream
+import com.soywiz.korio.stream.openAsync
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.core.*
-import io.ktor.utils.io.core.internal.*
 import tk.zwander.common.util.client
 import tk.zwander.common.util.generateProperUrl
 import kotlin.time.ExperimentalTime
@@ -97,12 +97,9 @@ class FusClient(
     }
 
     suspend fun downloadFile(fileName: String, start: Long = 0): Pair<AsyncInputStream, String?> {
-        // Simple file download logic
         val url = getDownloadUrl(fileName)
-        val response = client.use {
-            it.get<HttpResponse>(url)
-        }
-        val inputStream = response.content // Assuming content is of type AsyncInputStream
+        val response = client.get<HttpResponse>(url)
+        val inputStream = response.content // response.content is a ByteReadChannel
         return Pair(inputStream, null) // Returning null for second part of Pair for simplicity
     }
 
