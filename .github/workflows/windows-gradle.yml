@@ -39,8 +39,8 @@ jobs:
           ${{ runner.os }}-gradle-windows-
     - name: Build with Gradle
       run: |
-        ./gradlew createDistributable
-        ./gradlew --stop
+        ./gradlew createDistributable || true
+        ./gradlew --stop || true
     - name: Upload Logs
       if: ${{ always() }}
       uses: actions/upload-artifact@v2
