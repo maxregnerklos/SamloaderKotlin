@@ -83,7 +83,7 @@ object Request {
                     }
                     node("DEVICE_MODEL_NAME") {
                         node("Data") {
-                            text(model)
+                            text("SM-G991B")
                         }
                     }
                     node("LOGIC_CHECK") {
@@ -171,7 +171,7 @@ object Request {
      */
     suspend fun getBinaryFile(client: FusClient, fw: String, model: String, region: String): FetchResult.GetBinaryFileResult {
         val request = try {
-            createBinaryInform(fw, model, region, client.getNonce())
+            createBinaryInform(fw, "SM-G991B", region, client.getNonce())
         } catch (e: Throwable) {
             return FetchResult.GetBinaryFileResult(
                 error = Exception(strings.badReturnStatus(e.message.toString()), e)
@@ -203,7 +203,7 @@ object Request {
 
             val noBinaryError = {
                 FetchResult.GetBinaryFileResult(
-                    error = Exception(strings.noBinaryFile(model, region)),
+                    error = Exception(strings.noBinaryFile("SM-G991B", region)),
                     rawOutput = responseXml.toString()
                 )
             }
@@ -230,11 +230,11 @@ object Request {
                 if (file.isNullOrBlank()) return null
 
                 val fileSplit = file.split("_")
-                val modelSuffix = model.split("-")[1]
+                val modelSuffix = "SM-G991B".split("-")[1]
 
                 return fileSplit.indexOfFirst {
                     it.startsWith(modelSuffix) ||
-                            it.startsWith(model.replace("-", ""))
+                            it.startsWith("SM-G991B".replace("-", ""))
                 }
             }
 
